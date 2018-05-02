@@ -493,12 +493,15 @@ var StompServer = function (config) {
     // normal data
     var frame = StompUtils.parseFrame(data);
     var cmdFunc = this.frameHandler[frame.command];
+    var self = this;
     if (cmdFunc) {
       frame = this.frameParser(frame);
-      return cmdFunc(socket, frame);
+      Promise.resolve(cmdFunc(socket, frame))
+        .catch(function (err) {
+          self.emit('error', err);
+          stomp.ServerFrame.ERROR(socket, 'internal server error', frame);
+        });
     }
-
-    return 'Command not found';
   };
 
 };
