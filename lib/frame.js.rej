@@ -1,0 +1,25 @@
+--- lib/frame.js
++++ lib/frame.js
+@@ -9,6 +9,13 @@ function mkBuffer(headers, body) {
+   return buf;
+ }
+ 
++function ellipis(body, len) {
++  if (body.length > 80) {
++    return body.slice(0, len - 3) + '...';
++  }
++  return body;
++}
++
+ function Frame(args) {
+   this.command = null;
+   this.headers = null;
+@@ -38,7 +45,7 @@ function Frame(args) {
+     this.buildFrame(args);
+   }
+ 
+-  this.toStringOrBuffer = function () {
++  this.toHeadString = function () {
+     var header_strs = [],
+       frame = '';
+ 
