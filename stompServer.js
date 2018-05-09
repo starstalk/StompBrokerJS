@@ -311,7 +311,10 @@ var StompServer = function (config) {
         args.frame.command = 'MESSAGE';
         var sock = sub.socket;
         if (sock !== undefined) {
-          StompUtils.sendFrame(sock, args.frame);
+          StompUtils.sendFrame(sock, args.frame)
+            .catch(function (err) {
+              self.emit('error', err);
+            });
         } else {
           this.emit(sub.id, args.frame.body, args.frame.headers);
         }
@@ -499,7 +502,8 @@ var StompServer = function (config) {
       Promise.resolve(cmdFunc(socket, frame))
         .catch(function (err) {
           self.emit('error', err);
-          stomp.ServerFrame.ERROR(socket, 'internal server error', frame);
+          Stomp.ServerFrame.ERROR(socket, 'internal server error', frame)
+            .catch(function () {});
         });
     }
   };
